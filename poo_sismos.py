@@ -77,6 +77,15 @@ class Sismo(EventoSismico):
             str: categoría del sismo
         """
         # TU CÓDIGO AQUÍ
+        if self.magnitud < 6.0:
+            return 'Moderado-Fuerte'
+        elif self.magnitud < 7.0:
+            return 'Fuerte'
+        elif self.magnitud < 8.0:
+            return 'Mayor'
+        else:
+            return 'Gran terremoto'
+        
 
     def clasificar_profundidad(self):
         """
@@ -93,6 +102,13 @@ class Sismo(EventoSismico):
             str: tipo de sismo por profundidad
         """
         # TU CÓDIGO AQUÍ
+        if self.profundidad < 70.0:
+            return 'Superficial'
+        elif self.profundidad < 300.0:
+            return 'Intermedio'
+        else:
+            return 'Profundo'
+        
 
     def es_peligroso(self):
         """
@@ -107,6 +123,7 @@ class Sismo(EventoSismico):
             bool: True si cumple ambos criterios, False en caso contrario
         """
         # TU CÓDIGO AQUÍ
+        return self.magnitud >= 7.0 and self.profundidad < 70.0
 
     def descripcion(self):
         """
@@ -121,6 +138,9 @@ class Sismo(EventoSismico):
             str: descripción formateada del sismo
         """
         # TU CÓDIGO AQUÍ
+        cat_mag = self.clasificar()
+        cat_prof = self.clasificar_profundidad()
+        return f"Sismo mag={self.magnitud:.2f} | {cat_mag} | {cat_prof} | Lugar: {self.lugar} | Escala: {self.tipo_escala}"
 
     def __str__(self):
         return self.descripcion()
@@ -167,7 +187,16 @@ class CatalogoSismos:
         """
         if not self._sismos:
             return None
+        
         # TU CÓDIGO AQUÍ
+        if not self._sismos:
+            return None
+        sismo_max = self._sismos[0]
+        for sismo in self._sismos:
+            if sismo.magnitud > sismo_max.magnitud:
+                sismo_max = sismo
+        return sismo_max
+    
 
     def filtrar_por_categoria(self, categoria):
         """
@@ -183,6 +212,12 @@ class CatalogoSismos:
             list: lista de objetos Sismo filtrada (puede estar vacía)
         """
         # TU CÓDIGO AQUÍ
+        filtrados = []
+        for sismo in self._sismos:
+            if sismo.clasificar() == categoria:
+                filtrados.append(sismo)
+        return filtrados
+    
 
     def resumen(self):
         """
@@ -197,3 +232,17 @@ class CatalogoSismos:
             categorias = ['Moderado-Fuerte', 'Fuerte', 'Mayor', 'Gran terremoto']
         """
         # TU CÓDIGO AQUÍ
+        print(f"=== Catálogo: {self.nombre} ===")
+        print(f"Total de sismos: {len(self)}")
+        
+        mas_intenso = self.el_mas_intenso()
+        if mas_intenso:
+            print(f"Sismo más intenso: {mas_intenso}")
+        else:
+            print("Sismo más intenso: N/A")
+            
+        print("\nDesglose por categorías:")
+        categorias = ['Moderado-Fuerte', 'Fuerte', 'Mayor', 'Gran terremoto']
+        for cat in categorias:
+            total_cat = len(self.filtrar_por_categoria(cat))
+            print(f"  - {cat:<18}: {total_cat}")
